@@ -1,0 +1,59 @@
+-- | Este módulo define funções comuns da Tarefa 6 do trabalho prático.
+module Tarefa6_2018li1g142 where
+
+import LI11819
+import Tarefa0_2018li1g142
+import Tarefa1_2018li1g142
+import Tarefa4_2018li1g142
+
+-- PERGUNTAR AO STOR SE O INT IDENTIFICADOR DOS BOTS QUE A FUNCAO 'bot' RECEBE É {0,1,2,3} OU {1,2,3,4}
+
+-- * Funções principais da Tarefa 6.
+
+-- | Define um ro'bot' capaz de jogar autonomamente o jogo.
+bot :: Int          -- ^ O identificador do 'Jogador' associado ao ro'bot'.
+    -> Estado       -- ^ O 'Estado' para o qual o ro'bot' deve tomar uma decisão.
+    -> Maybe Jogada -- ^ Uma possível 'Jogada' a efetuar pelo ro'bot'.
+bot i e = undefined
+
+
+-- | Vê se joga laser
+jogaLaser :: Int -> Estado -> Maybe Jogada
+jogaLaser i e = undefined
+
+-- | Dá o jogador associado ao bot
+jogBot :: Int -> Estado -> Jogador
+jogBot i (Estado m (w:x:y:[z]) ds) = case i of
+                            0 -> w
+                            1 -> x
+                            2 -> y
+                            3 -> z
+
+-- | Devolve as posições grelha centrais de um jogador
+centralPoints :: Jogador -> [PosicaoGrelha]
+centralPoints (Jogador (x,y) dir v l c) = [(x,y),(x-1,y),(x+1,y),(x,y+1),(x,y-1)]
+
+
+
+{-
+m = mapaInicial(6,6)
+j = Jogador (4,4) C 1 1 1
+
+-- | Area de ['PosicaoGrelha'] com os pontos centrais do jogador
+pontosFrente :: Jogador -> Mapa -> [PosicaoGrelha]
+pontosFrente j@(Jogador (x,y) dir v l c) m = case dir of
+                                            C -> if isParede j m 
+                                                 then 
+                                                 else (x-1,y):pontosFrente (Jogador (x-1,y) dir v l c) m
+                                            --D ->
+  --                                          B ->
+--                                            E ->
+
+isParede :: Jogador -> Mapa -> Bool
+isParede (Jogador (x,y) dir _ _ _) m = case dir of
+                                            C -> temIndestrutivel (x-1,y) m || temIndestrutivel (x-1,y+1) m
+                                            D -> temIndestrutivel (x,y+2) m || temIndestrutivel (x+1,y+2) m
+                                            B -> temIndestrutivel (x+2,y) m || temIndestrutivel (x+2,y+1) m
+                                            E -> temIndestrutivel (x,y-1) m || temIndestrutivel (x+1,y-1) m
+
+-}

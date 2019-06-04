@@ -1,0 +1,93 @@
+-- | Este módulo define funções comuns da Tarefa 6 do trabalho prático.
+module Tarefa6_2018li1g142 where
+
+import LI11819
+import Tarefa0_2018li1g142
+import Tarefa1_2018li1g142
+import Tarefa2_2018li1g142
+import Tarefa4_2018li1g142
+
+-- * Funções principais da Tarefa 6.
+
+-- | Define um ro'bot' capaz de jogar autonomamente o jogo.
+bot :: Int          -- ^ O identificador do 'Jogador' associado ao ro'bot'.
+    -> Estado       -- ^ O 'Estado' para o qual o ro'bot' deve tomar uma decisão.
+    -> Maybe Jogada -- ^ Uma possível 'Jogada' a efetuar pelo ro'bot'.
+bot i e = if isAlive (jogBot i e) then play i e
+                                  else Nothing
+
+e = Estado (mapaInicial (8,8)) [Jogador (1,1) B 1 1 1] [DisparoCanhao 0 (2,1) B]
+
+-- | O ro'bot' efetua uma 'Jogada'.
+play :: Int -> Estado -> Maybe Jogada
+play i e = if jogaLaser i e && temLaser (jogBot i e) then Just (Dispara Laser)  
+                else if jogouCanhao i e (botCan i e) || isIndestrutivel (jogBot i e) m 
+                     then Just (Movimenta (rodaDir (direcaoJogador (jogBot i e))))
+                     else Just (Dispara Canhao)
+              where m = mapaEstado e
+
+{-
+-- | Encontra uma direção que não tenha uma parede indestrutivel adjacente ao bot.
+novaDir :: Jogador -> Mapa -> Direcao
+novaDir (Jogador p dir v l c) m = if isIndestrutivel (Jogador p dir v l c) m 
+                                  then novaDir (Jogador p (rodaDir dir) v l c) m
+                                  else rodaDir dir-}
+
+-- | Roda a direção 90º no sentido hórario
+rodaDir :: Direcao -> Direcao
+rodaDir dir = case dir of
+                    C -> D
+                    D -> B
+                    B -> E
+                    E -> C
+
+-- | Testa se joga o canhão ou muda de direção.
+jogouCanhao :: Int -> Estado -> [Disparo] -> Bool
+jogouCanhao i e [] = False
+jogouCanhao i e (h:t) = direcaoJogador (jogBot i e) == direcaoDisparo h 
+
+-- | Lista de canhões do 'bot'
+botCan :: Int -> Estado -> [Disparo]
+botCan i (Estado m js []) = []
+botCan i (Estado m js (h:t)) = if jogadorDisparo h == i then h : botCan i (Estado m js t)
+                               else botCan i (Estado m js t)
+
+-- | Testa se joga o laser
+jogaLaser :: Int -> Estado -> Bool
+jogaLaser i e = length (filter (`elem` (pontosFrente (jogBot i e) m)) (posiJogs js)) > 0
+                where m  = mapaEstado e
+                      js = jogadoresEstado e
+
+-- | Lista de 'PosicaoGrelha' de todos os jogadores vivos
+posiJogs :: [Jogador] -> [PosicaoGrelha]
+posiJogs [] = []
+posiJogs (h:t) = if isAlive h then posicaoJogador h : posiJogs t
+                              else posiJogs t
+
+-- | Dá o jogador associado ao bot
+jogBot :: Int -> Estado -> Jogador
+jogBot i (Estado m (h:t) ds) = if i == 0 then h else jogBot (i-1) (Estado m t ds)
+
+-- | Area de ['PosicaoGrelha'] com os pontos centrais do jogador
+pontosFrente :: Jogador -> Mapa -> [PosicaoGrelha]
+pontosFrente j@(Jogador (x,y) dir v l c) m = case dir of
+                                            C -> if isIndestrutivel j m 
+                                                 then []
+                                                 else (x-1,y):pontosFrente (Jogador (x-1,y) dir v l c) m
+                                            D -> if isIndestrutivel j m 
+                                                 then []
+                                                 else (x,y+1):pontosFrente (Jogador (x,y+1) dir v l c) m
+                                            B -> if isIndestrutivel j m 
+                                                 then []
+                                                 else (x+1,y):pontosFrente (Jogador (x+1,y) dir v l c) m
+                                            E -> if isIndestrutivel j m 
+                                                 then []
+                                                 else (x,y-1):pontosFrente (Jogador (x,y-1) dir v l c) m
+
+-- | Teste se uma 'PosicaoGrelha' seguinte tem parede indestrutivel.
+isIndestrutivel :: Jogador -> Mapa -> Bool
+isIndestrutivel (Jogador (x,y) dir _ _ _) m = case dir of
+                                            C -> temIndestrutivel (x-1,y) m || temIndestrutivel (x-1,y+1) m
+                                            D -> temIndestrutivel (x,y+2) m || temIndestrutivel (x+1,y+2) m
+                                            B -> temIndestrutivel (x+2,y) m || temIndestrutivel (x+2,y+1) m
+                                            E -> temIndestrutivel (x,y-1) m || temIndestrutivel (x+1,y-1) m

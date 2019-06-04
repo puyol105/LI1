@@ -1,0 +1,196 @@
+-- | Este módulo define funções comuns da Tarefa 5 do trabalho prático.
+module Tarefa5_2018li1g142 where
+
+import LI11819
+import Tarefa1_2018li1g142
+import Graphics.Gloss         
+import Graphics.Gloss.Data.Picture  
+import Graphics.Gloss.Interface.Pure.Game
+
+-- | Imagens do Jogo
+data Pics = Pics
+    { p1     :: Picture  -- ^ Imagems do jogador 1
+    , p2     :: Picture  -- ^ Imagems do jogador 1
+    , p3     :: Picture  -- ^ Imagems do jogador 1
+    , p4     :: Picture  -- ^ Imagems do jogador 1
+    , laser  :: Picture  -- ^ Imagem do Laser
+    , canhao :: Picture  -- ^ Imagem do canhao
+    , choque :: Picture  -- ^ imagem do choque
+    }
+  deriving (Show,Eq)
+
+-- | Controlos do Jogo
+data Keys = Keys
+    { p1Up      :: Event  -- ^ Chave que movimenta o jogador 1 para Cima
+    , p1Down    :: Event  -- ^ Chave que movimenta o jogador 1 para Baixo
+    , p1Left    :: Event  -- ^ Chave que movimenta o jogador 1 para Esquerda
+    , p1Rigth   :: Event  -- ^ Chave que movimenta o jogador 1 para Direita
+    , p1Canhao  :: Event  -- ^ Chave que o jogador 1 dispara o canhao
+    , p1Laser   :: Event  -- ^ Chave que o jogador 1 dispara o laser
+    , p1Choque  :: Event  -- ^ Chave que o jogador 1 dispara o choque
+    , p2Up      :: Event  -- ^ Chave que movimenta o jogador 2 para Cima
+    , p2Down    :: Event  -- ^ Chave que movimenta o jogador 2 para Baixo
+    , p2Left    :: Event  -- ^ Chave que movimenta o jogador 2 para Esquerda
+    , p2Rigth   :: Event  -- ^ Chave que movimenta o jogador 2 para Direita
+    , p2Canhao  :: Event  -- ^ Chave que o jogador 2 dispara o canhao
+    , p2Laser   :: Event  -- ^ Chave que o jogador 2 dispara o laser
+    , p2Choque  :: Event  -- ^ Chave que o jogador 2 dispara o choque
+    , p3Up      :: Event  -- ^ Chave que movimenta o jogador 3 para Cima
+    , p3Down    :: Event  -- ^ Chave que movimenta o jogador 3 para Baixo
+    , p3Left    :: Event  -- ^ Chave que movimenta o jogador 3 para Esquerda
+    , p3Rigth   :: Event  -- ^ Chave que movimenta o jogador 3 para Direita
+    , p3Canhao  :: Event  -- ^ Chave que o jogador 3 dispara o canhao
+    , p3Laser   :: Event  -- ^ Chave que o jogador 3 dispara o laser
+    , p3Choque  :: Event  -- ^ Chave que o jogador 3 dispara o choque
+    , p4Up      :: Event  -- ^ Chave que movimenta o jogador 4 para Cima
+    , p4Down    :: Event  -- ^ Chave que movimenta o jogador 4 para Baixo
+    , p4Left    :: Event  -- ^ Chave que movimenta o jogador 4 para Esquerda
+    , p4Rigth   :: Event  -- ^ Chave que movimenta o jogador 4 para Direita
+    , p4Canhao  :: Event  -- ^ Chave que o jogador 4 dispara o canhao
+    , p4Laser   :: Event  -- ^ Chave que o jogador 4 dispara o laser
+    , p4Choque  :: Event  -- ^ Chave que o jogador 4 dispara o choque
+    , pausa     :: Event  -- ^ Pausa no Jogo
+    , restart   :: Event  -- ^ Recomeça do Jogo
+    }
+  deriving (Show,Eq)
+
+keysDefault = Keys (EventKey (Char 'w') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 's') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'a') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'd') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '1') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '2') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '3') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 't') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'g') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'f') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'h') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '4') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '5') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '6') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'i') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'k') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'j') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char 'l') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '7') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '8') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '9') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (SpecialKey KeyUp)    Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (SpecialKey KeyDown)  Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (SpecialKey KeyLeft)  Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (SpecialKey KeyRight) Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char ',') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '.') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (Char '-') Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (SpecialKey KeyF1)  Down (Modifiers Down Down Down) (0,0))
+                   (EventKey (SpecialKey KeyF5)  Down (Modifiers Down Down Down) (0,0))
+
+data World = World
+    { estado :: Estado -- ^ Estado do Jogo
+    , keys   :: Keys   -- ^ Mapa de commandos
+    , editor :: Editor -- ^ Editor para criar o Estado Inicial
+    }
+ deriving (Show,Eq)
+
+
+
+
+
+
+estadoInicial :: Picture -> ((Float,Float),Picture)
+estadoInicial x = ((0,0),x)
+
+poligno :: Picture
+poligno = Polygon [(0,0),(10,0),(10,10),(0,10),(0,0)]
+
+desenhaEstado :: ((Float,Float),Picture) -> Picture
+desenhaEstado ((x,y),p) = Translate x y p
+
+reageEvento :: Event -> ((Float,Float),Picture) -> ((Float,Float),Picture)
+reageEvento (EventKey (SpecialKey KeyUp)    Down _ _) ((x,y),p) = ((x,y+5),p)
+reageEvento (EventKey (SpecialKey KeyDown)  Down _ _) ((x,y),p) = ((x,y-5),p)
+reageEvento (EventKey (SpecialKey KeyLeft)  Down _ _) ((x,y),p) = ((x-5,y),p)
+reageEvento (EventKey (SpecialKey KeyRight) Down _ _) ((x,y),p) = ((x+5,y),p)
+reageEvento _ s = s -- ignora qualquer outro evento
+
+reageTempo :: Float -> ((Float,Float),Picture) -> ((Float,Float),Picture)
+reageTempo n ((x,y),p) = ((x,y-0.1),p)
+
+
+-- | Frame rate
+fr :: Int
+fr = 88
+
+-- | dm indica todas as informações sobre a janela do jogo.
+dm :: Display
+dm = InWindow "Tanks Grupo 142" (800, 600) (0, 0)
+
+-- | Função principal da Tarefa 5.
+--
+-- __NB:__ Esta Tarefa é completamente livre. Deve utilizar a biblioteca <http://hackage.haskell.org/package/gloss gloss> para animar o jogo, e reutilizar __de forma completa__ as funções das tarefas anteriores.
+main :: IO ()
+main = do
+       p <- (loadBMP "./img/tank1.bmp")
+       play dm              -- janela onde irá correr o jogo
+            (greyN 0.5)     -- côr do fundo da janela
+            fr              -- frame rate
+            (estadoInicial p)  -- estado inicial
+            desenhaEstado   -- desenha o estado do jogo
+            reageEvento     -- reage a um evento
+            reageTempo      -- reage ao passar do tempo
+
+
+{-
+type Estado = (Float,Float)
+
+estadoInicial :: Estado
+estadoInicial = (0,0)
+
+poligno :: Picture
+poligno = Polygon [(0,0),(10,0),(10,10),(0,10),(0,0)]
+
+desenhaEstado :: Estado -> Picture
+desenhaEstado (x,y) = Translate x y poligno
+
+reageEvento :: Event -> Estado -> Estado
+reageEvento (EventKey (SpecialKey KeyUp)    Down _ _) (x,y) = (x,y+5)
+reageEvento (EventKey (SpecialKey KeyDown)  Down _ _) (x,y) = (x,y-5)
+reageEvento (EventKey (SpecialKey KeyLeft)  Down _ _) (x,y) = (x-5,y)
+reageEvento (EventKey (SpecialKey KeyRight) Down _ _) (x,y) = (x+5,y)
+reageEvento _ s = s -- ignora qualquer outro evento
+
+reageTempo :: Float -> Estado -> Estado
+reageTempo n (x,y) = (x,y-0.1)
+
+-- * Estado Gloss
+
+type EstadoGloss = (Estado,Picture)
+
+estadoGlossInicial :: Picture -> EstadoGloss
+estadoGlossInicial bola = (estadoInicial,bola)
+
+desenhaEstadoGloss :: EstadoGloss -> Picture
+desenhaEstadoGloss ((x,y),bola) = Translate x y bola
+
+reageEventoGloss :: Event -> EstadoGloss -> EstadoGloss
+reageEventoGloss ev (e,bola) = (reageEvento ev e,bola)
+
+reageTempoGloss :: Float -> EstadoGloss -> EstadoGloss
+reageTempoGloss t (e,bola) = (reageTempo t e,bola)
+
+fr :: Int
+fr = 50
+
+dm :: Display
+dm = InWindow "Tanks Grupo 142" (400, 400) (0, 0)
+
+main :: IO ()
+main = do 
+    p <- (loadBMP "./img/grass.bmp")
+    play dm                       -- janela onde irá correr o jogo
+        (greyN 0.5)               -- côr do fundo da janela
+        fr                        -- frame rate
+        (estadoGlossInicial p) -- estado inicial
+        desenhaEstadoGloss        -- desenha o estado do jogo
+        reageEventoGloss          -- reage a um evento
+        reageTempoGloss           -- reage ao passar do tempo-}
